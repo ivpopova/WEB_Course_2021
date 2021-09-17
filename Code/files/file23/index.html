@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="bg">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/ico" href="img/favicon.ico">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <script src="javascript/script.js"></script>
+    <title>Configure SSL on XAMPP</title>
+  </head>
+  <body>
+    <header>
+      <h1>Configure SSL on XAMPP</h1>
+    </header>
+    <aside>
+      <a href="#sect-1">Въведение</a>
+      <a href="#sect-2">Технологията Secure Sockets Layer</a>
+      <a href="#sect-3">SSL сертификатът</a>
+      <a href="#sect-4">Типове SSL сертификати</a>
+      <a href="#sect-5">Как SSL сертификатът създава сигурна връзка?</a>
+      <a href="#sect-6">Кои са Let’s Encrypt?</a>
+      <a href="#sect-7">Как да си инсталираме SSL сертификат?</a>
+      <a href="#sect-8">Източници</a>
+    </aside>
+    <main>
+      <section id="sect-1">
+        <h2>Въведение</h2>
+        <p>
+          Всеки от нас посещава поне една уеб страница всеки ден.
+          Но замисляли ли сте се колко важна информация преминава от вашият компютър към сървърите на сайтовете, които
+          посещавате? Вероятно не.
+          Време е да се замислите – прегледайте внимателно следващите точки, за да разберете повече за своята
+          онлайн сигурност и как да инсталирате SSL сертификат на вашият XAMPP сървър.
+        </p>
+      </section>
+      <section id="sect-2">
+        <h2>Технологията Secure Sockets Layer</h2>
+        <figure>
+          <img src="img/figure1.png" alt="Фиг 1. Илюстрация на SSL" />
+          <figcaption>Фиг 1. Илюстрация на SSL <sup><a href="#src-11">[11]</a></sup></figcaption>
+        </figure>
+        <p>
+          SSL (Secure Sockets Layer) е стандартна технология за сигурност, която осъществява криптирана връзка между
+          сървър и клиент – обикновено уеб сървър (уебсайт) и браузър, или мейл сървър и клиент (напр. Outlook).
+          <sup><a href="#src-6">[6]</a></sup>
+        </p>
+        <p>
+          SSL позволява да се изпраща чувствителна информация като номера на кредитни карти, лични данни, логин
+          информация и други. По принцип, данните се изпращат между браузъра и уеб сървъра в чист текст – което
+          отваря вратата за потенциални атаки. Ако трето лице успее да се добере до информацията, която се изпраща
+          между един браузър и уеб сървър, той ще може да прочете всяка част от тази информация.
+        </p>
+        <p>
+          Тук идва SSL – който освен друго е и протокол за сигурност.
+          Протоколите дефинират как трябва да бъдат използвани дадени алгоритми.
+          В случая, SSL протокола дефинира променливи, които трябва да бъдат използвани при
+          криптирането на връзката и данните през нея.
+        </p>
+        <p>
+          Всички браузъри поддържат SSL.
+          За да установят криптирана връзка обаче, те се нуждаят от т. нар. SSL сертификат.
+        </p>
+      </section>
+      <section id="sect-3">
+        <h2>SSL сертификатът</h2>
+        <figure style="float: left; margin: 10px 15px 10px 0; width: 300px;">
+          <img style="width: 300px;" src="img/figure2.png" alt="Фиг 2. Илюстрация на EV индикатор" />
+          <figcaption>Фиг 2. Илюстрация на EV индикатор <sup><a href="#src-12">[12]</a></sup></figcaption>
+        </figure>
+        <p>
+          SSL сертификатите криптират връзката между вашето устройство и сървъра и установяват доверие.
+          За да се покаже на потребителите, че връзката им е сигурна, браузърите показват т.нар.
+          EV индикатори – от катинарче до брандиран зелен бар.
+        </p>
+        <figure style="float: right; margin: 10px 0 10px 15px; width: 150px;">
+          <img style="width: 150px;" src="img/figure3.png" alt="Фиг 3. Илюстрация на публичен и частен ключ" />
+          <figcaption>Фиг 3. Илюстрация на публичен и частен ключ <sup><a href="#src-6">[6]</a></sup></figcaption>
+        </figure>
+        <p>
+          SSL сертификатите имат двойка ключове: публичен и частен ключ.
+          Тези ключове, използвани в комбинация създават криптирана връзка.
+          Сертификатът съдържа и т.нар. “subject”, или „предмет“,
+          който представлява идентичността на притежателя на сертификата или уебсайта.
+        </p>
+        <p>
+          За да получите сертификат, трябва да създадете заявка – т.нар. Certificate Signing Request (CSR).
+          Този процес създава публичен и частен ключ.
+          Този CSR файл се изпраща на издателя на SSL сертификата (наречен още Certificate Authority ли CA).
+          Издателят използва CSR файла, за да създаде структура, която съвпада с вашия частен ключ,
+          без да го компрометира. Издателят никога не вижда частния ключ.
+          След получаване на SSL сертификата, вие можете да го инсталирате на сървъра си.
+          <sup><a href="#src-6">[6]</a></sup>
+        </p>
+        <p>
+          Най-важната част от SSL сертификата е, че той е електронно подписан от сигурен издател – такива са например
+          IdenTrust, DigiCert, Sectigo, GoDaddy, и не на последно място - запомнете това име –
+          <strong>Let’s encrypt</strong>. <sup><a href="#src-7">[7]</a></sup>
+          Всеки може да създаде сертификат, но браузърите се доверяват единствено на сертификати, които са издадени
+          от организация, която присъства в техния лист от доверени издатели (CA). За да бъде включена в този лист,
+          една компания-издател трябва да спазва стандарти за сигурност и автентикация, поставени от самите браузъри.
+        </p>
+        <p>
+          Един SSL сертификат, който е издаден от CA на друга организация / компания доказва, че доверена трета
+          страна (организацията – издател) е проверила и се доверява на тази организация. Тъй като браузъра
+          вярва на организацията-издател, той вече вярва и на организацията, собственик на сертификата
+          (респективно уебсайта).
+        </p>
+      </section>
+      <section id="sect-4">
+        <h2>Типове SSL сертификати</h2>
+        <p>
+          В зависимост от степента на проверка на организацията, която желае издаване на SSL сертификат,
+          те се класифицират в три вида: Domain Validated (DV SSL), Organization Validated (OV SSL),
+          Extended Validation (EV SSL). <sup><a href="#src-8">[8]</a></sup>
+        </p>
+        <h3>Domain Validated (DV SSL) Сертификати</h3>
+        <p>
+          Този тип сертификати е най-прост за издаване, съответно добра идея за малки бизнеси,
+          които имат нужда от бързо издаване на сертификат без изпращане на документи с информация за компанията.
+          Организацията-издател (CA) проверява правото на даден желаещ да използва определено домейн име.
+          Не се проверява самата организация, следователно въпреки че можете да бъдете сигурни, че информацията
+          ви се криптира, не можете да бъдете сигурни кой стои от другата страна и получава вашата информация.
+          Този тип на сертификат е и обикновено най-евтин.
+        </p>
+        <h3>Organization Validated (OV SSL) Сертификати</h3>
+        <p>
+          OV SSL сертификатът проверява както правото на даден желаещ да използва домейн името,
+          така и прави известна проверка на организацията. Информацията за организацията се показва и на
+          потребителите, когато проверят информацията на сертификата, показвана в браузъра. Този тип
+          сертификат обикновено е по-скъп от DV SSL сертификатът.
+        </p>
+        <h3>Extended Validation (EV SSL) Сертификати</h3>
+        <p>
+          При Extended Validation Сертификатите, организацията-издател (CA) прави пълна проверка на желаещият,
+          чрез процес, който е стриктно описан в документ, наречен EV Guidelines, ратифициран от CA/Browser
+          форумът през 2007 г. <sup><a href="#src-9">[9]</a></sup> Този тип сертификат е най-довереният,
+          съответно обаче и най-скъп.
+        </p>
+      </section>
+      <section id="sect-5">
+        <h2>Как SSL сертификатът създава сигурна връзка?</h2>
+        <figure>
+          <img src="img/figure4.png" alt="Фиг 4. Илюстрация на процеса на ръкостискане" />
+          <figcaption>Фиг 4. Илюстрация на процеса на ръкостискане <sup><a href="#sect-6">[6]</a></sup></figcaption>
+        </figure>
+        <p>
+          Когато браузър се опита да достъпи уебсайт, който е защитен с SSL,
+          браузърът и уеб сървърът осъществяват SSL връзка чрез процес, наречен “SSL handshake”
+          (или “SSL ръкостискане“). Той се случва зад кулисите и почти мигновено.
+        </p>
+        <p>
+          Три ключа се използват, за да се установи SSL връзката: това са публичният,
+          частният и ключът на сесията. Всичко, което се криптира с публичният ключ може
+          да бъде декриптирано единствено с частния ключ, и обратно. Тъй като обаче криптирането и
+          декриптирането с публичния и частния ключ изисква много процесорна мощ, те се използват
+          само през процеса на ръкостискане, за да се създаде симетричен „ключ на сесията“ (session key).
+          След като премине ръкостискането, ключът на сесията се използва, за да се криптират всички данни.
+          <sup><a href="#src-6">[6]</a></sup>
+        </p>
+        <h3>Как преминава ръкостискането? (фиг. 4)</h3>
+        <p>
+          <strong>Стъпка 1.</strong> Браузърът се свързва с уеб сайт (сървър), който е защитен с SSL (https).
+          Браузърът изисква от сървъра да се легитимира.
+        </p>
+        <p>
+          <strong>Стъпка 2.</strong> Сървърът изпраща копие от неговия SSL сертификат, включително и публичният му ключ.
+        </p>
+        <p>
+          <strong>Стъпка 3.</strong> Браузърът проверява сертификата, като първо търси неговият издател в
+          списъкът си с доверени издатели, след което дали сертификатът не е изтекъл, премахнат, както и
+          дали името на сертификата е валидно за уебсайта, с който се опитва връзка. Ако браузърът се доверява
+          на сертификата, той създава, криптира и изпраща симетричният ключ за сесията, използвайки публичният
+          ключ на сървъра.
+        </p>
+        <p>
+          <strong>Стъпка 4.</strong> Сървърът декриптира симетричният сесиен ключ със своят частен ключ
+          и изпраща обратно съобщение, криптирано с ключа за сесията, за да започне криптираната сесия.
+        </p>
+        <p>
+          <strong>Стъпка 5.</strong> Сървърът и браузърът вече предават данни помежду си,
+          криптирани със симетричния сесиен ключ. <sup><a href="#src-6">[6]</a></sup>
+        </p>
+      </section>
+      <section id="sect-6">
+        <h2>Кои са Let’s Encrypt?</h2>
+        <p>
+          Както описахме по-горе, важна част от един SSL сертификат е неговата организация-издател,
+          която трябва да бъде в списъкът на доверени издатели на всеки един браузър. Тъй като такива
+          организации са малко, а услугата – издаване на SSL сертификат при тях се заплаща, това представя
+          един проблем – много малки уебсайтове не могат да си позволят да криптират връзката си с потребителите,
+          тъй като не могат да заплатят за SSL сертификат.
+        </p>
+        <p>
+          Тук се намесват Let’s Encrypt – организация с нестопанска цел, които се стремят да направят
+          сигурната връзка и SSL сертификатите повсеместни. Let’s Encrypt – създадени от Internet Security
+          Research Group (ISRG), част от които включват: Electronic Frontier Foundation, Mozilla Foundation,
+          Университета в Мичиган, Akamai Technologies и Cisco Systems, предоставят безплатни SSL сертификати
+          с период на валидност 90 дни. <sup><a href="#src-2">[2]</a></sup>
+        </p>
+        <p>
+          Let’s Encrypt издават единствено Domain Validated сертификати (DV SSL), тъй като те могат да
+          бъдат напълно автоматизирани. OV SSL и EV SSL се нуждаят от валидация, която се извършва от хора,
+          съответно не се предлагат от Let’s Encrypt, тъй като няма да могат да бъдат безплатни.
+          <sup><a href="#src-10">[10]</a></sup>
+        </p>
+        <p>
+          Let’s Encrypt предлага наистина лесно инсталиране на DV SSL сертификат на един Linux сървър.
+          Единственото, което е необходимо са две команди:
+        </p>
+        <pre><code>
+          sudo apt-get install lets-encrypt
+          lets-encrypt example.com
+        </code></pre>
+        <p>
+          Това е всичко! Лесно, а? И така трябва да бъде. Основните принципи на Let’s Encrypt са:
+        </p>
+        <ul>
+          <li><strong>Безплатен</strong> – всеки, които притежава домейн може да използва Let’s encrypt,
+            за да си осигури SSL сертификат абсолютно безплатно.</li>
+          <li><strong>Автоматичен</strong> – софтуер, който работи на уеб сървъра може да се свърже с
+            Let’s encrypt, за да осигури сертификат, да го настрои за работа и да следи за подновяването му.</li>
+          <li><strong>Сигурен</strong> – Let’s encrypt е платформа, която винаги ще имплементира най-новите
+            SSL/TLS стандарти, както от страната на издател (CA), така и помагайки на собствениците на
+            уебсайтове да бъдат максимално защитени.</li>
+          <li><strong>Прозрачен</strong> – Всички сертификати, които се издават или отменят, са публично достъпни
+            за преглеждане от всеки в Интернет.</li>
+          <li><strong>Отворен</strong> – Протоколът за автоматично издаване и подновяване на сертификат е
+            публикуван за свободно използване от всеки.</li>
+          <li><strong>Кооперативен</strong> – Както всички Интернет протоколи, Let’s Encrypt е опит да се
+            помогне на интернет общността, далеч от ползите за всяка една индивидуална компания.
+          <sup><a href="#src-10">[10]</a></sup></li>
+        </ul>
+      </section>
+      <section id="sect-7">
+        <h2>Как да си инсталираме SSL сертификат?</h2>
+        <p>
+          За целите на този реферат, ще използваме сървъра на XAMPP,
+          за да покажем как се инсталира self-signed SSL сертификат.
+        </p>
+        <p>
+          <strong>Важно!</strong> Бихме могли да използваме SSL сертификат, който е подписан от
+          Let’s Encrypt, но за тази цел трябва да притежаваме домейн, на който да можем да докажем
+          собствеността. По тази причина, ние ще създадем self-signed сертификат (подписан собственоръчно),
+          който можем да подпишем за домейн по наш избор. Инсталирането на Let’s Encrypt сертификат за XAMPP
+          е тема на друг реферат.
+        </p>
+        <p>
+          XAMPP е безплатен и open-source софтуер за всякакви платформи, пакет, включващ Apache,
+          MariaDB, PHP и Perl. След инсталация на вашият компютър, с XAMPP лесно можете да стартирате
+          всеки свой уеб проект – само с няколко клика. XAMPP използва virtual hostname, или виртуално име, за да
+          ви предостави достъп до вашите проекти. Обикновено това име е <code>localhost</code>. С инсталирането на SSL
+          сертификат обаче, то ще се промени на домейн по ваш избор.
+        </p>
+        <h3>Създаване на сертификат <sup><a href="#src-1">[1]</a></sup></h3>
+        <ul>
+          <li>Отидете в своята XAMPP инсталационна директория (Напр. <code>C:\Xampp</code>). След което намерете Apache
+          директорията (напр. <code>C:\Xampp\Apache</code>). В нея намерете и отворете скрипт,
+          наречен <code>makecert.bat</code>.</li>
+          <li>
+            Ще се отвори команден прозорец, в който трябва да въведете известен набор от данни,
+            след всеки от които е необходимо да се натиска Enter. Те включват:
+            <ul>
+              <li><strong>PEM Passphrase</strong> – Парола, която криптира вашият частен сървърен ключ.
+                Запомнете я – напр. <code>thisisaverynotsecurepassword</code>;</li>
+              <li><strong>Повтаряне на PEM Passphrase</strong> – дано не сте я забравили!</li>
+              <li><strong>Код на държавата</strong> – в нашия случай <code>BG</code>;</li>
+              <li><strong>Област или име на провинцията</strong> – в нашия случай <code>Sofia</code>;</li>
+              <li><strong>Име на населеното място</strong> – напр. <code>Sofia</code>;</li>
+              <li><strong>Име на организацията</strong> – напр. <code>Web Abstract Ltd.</code>;</li>
+              <li><strong>Част (отдел) на организацията</strong> – оставете празно;</li>
+              <li><strong>Common name</strong> – тук впишете домейнът, който смятате да
+                ползвате и за когото ще бъде издаден сертификатът – напр. <code>webabstract.ltd</code>;</li>
+              <li><strong>Имейл адрес</strong> – напр. <code>kiril@webabstract.ltd</code>;</li>
+              <li><strong>Challenge password</strong> – оставете празно;</li>
+              <li><strong>Optional company name</strong> – оставете празно;</li>
+              <li><strong>Enter pass phrase for privkey.pem</strong> – въведете паролата, която написахте в началото.</li>
+            </ul>
+            <figure>
+              <img src="img/figure5.png" alt="Фиг 5. Екранна снимка - използване на makecert.bat за създаване на сертификат." />
+              <figcaption>Фиг 5. Екранна снимка - използване на makecert.bat за създаване на сертификат.</figcaption>
+            </figure>
+          </li>
+        </ul>
+        <h3>Конфигуриране на Apache да използва HTTPS връзка</h3>
+        <p>
+          Въпреки, че сертификатът е създаден, трябва да конфигурираме Apache да използва само и
+          единствено HTTPS връзка, вместо HTTP. Това може да се случи като редактираме файла:
+        </p>
+        <pre><code>
+          C:\Xampp\Apache\conf\extra\httpd-xampp.conf
+        </code></pre>
+        <p>
+          Директивата <code>SSLRequireSSL</code> посочва на Apache сървъра да приема само връзки,
+          които са криптирани с SSL. За да се включи тя, трябва да се добави като ред
+          в описанието (преди <code>&lt;/Directory&gt;</code>) на всяка една от потребителите директории.
+          В долната таблица от лявата страна е посочен кодът, който е в конфигурационния файл по подразбиране,
+          а в дясната - кодът, който трябва да се запамети.
+        </p>
+        <figure class="tableContainer">
+        <table>
+          <thead>
+            <tr>
+              <td>
+                Оригинален код
+              </td>
+              <td>
+                Преработен код
+              </td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <pre><code>
+Alias /phpmyadmin "C:/xampp/phpMyAdmin/"
+  &lt;Directory "C:/xampp/phpMyAdmin"&gt;
+    AllowOverride AuthConfig
+    Require local
+    ErrorDocument 403 /error/XAMPP_FORBIDDEN.html.var
+  &lt;/Directory&gt;
+                </code></pre>
+              </td>
+              <td>
+                <pre><code>
+Alias /phpmyadmin "C:/xampp/phpMyAdmin/"
+  &lt;Directory "C:/xampp/phpMyAdmin"&gt;
+    AllowOverride AuthConfig
+    Require local
+    ErrorDocument 403 /error/XAMPP_FORBIDDEN.html.var
+    SSLRequireSSL
+  &lt;/Directory&gt;
+                </code></pre>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <pre><code>
+&lt;Directory "C:/xampp/htdocs/xampp"&gt;
+  &lt;IfModule php_module&gt;
+    &lt;Files "status.php"&gt;
+      php_admin_flag safe_mode off
+    &lt;/Files>
+  &lt;/IfModule&gt;
+  AllowOverride AuthConfig
+&lt;/Directory&gt;
+                </code></pre>
+              </td>
+              <td>
+                <pre><code>
+&lt;Directory "C:/xampp/htdocs/xampp"&gt;
+  &lt;IfModule php_module&gt;
+    &lt;Files "status.php"&gt;
+      php_admin_flag safe_mode off
+    &lt;/Files&gt;
+  &lt;/IfModule&gt;
+  AllowOverride AuthConfig
+  SSLRequireSSL
+&lt;/Directory&gt;
+                </code></pre>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <pre><code>
+Alias /webalizer "C:/xampp/webalizer/"
+  &lt;Directory "C:/xampp/webalizer"&gt;
+    &lt;IfModule php_module&gt;
+        &lt;Files "webalizer.php"&gt;
+          php_admin_flag safe_mode off
+        &lt;/Files&gt;
+    &lt;/IfModule&gt;
+    AllowOverride AuthConfig
+    Require local
+    ErrorDocument 403 /error/XAMPP_FORBIDDEN.html.var
+  &lt;/Directory&gt;
+                </code></pre>
+              </td>
+              <td>
+                <pre><code>
+Alias /webalizer "C:/xampp/webalizer/"
+  &lt;Directory "C:/xampp/webalizer"&gt;
+    &lt;IfModule php_module&gt;
+      &lt;Files "webalizer.php"&gt;
+        php_admin_flag safe_mode off
+      &lt;/Files&gt;
+    &lt;/IfModule&gt;
+    AllowOverride AuthConfig
+    Require local
+    ErrorDocument 403 /error/XAMPP_FORBIDDEN.html.var
+    SSLRequireSSL
+&lt;/Directory&gt;
+                </code></pre>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <figcaption>Таблица 1. Директиви, които се нуждаят от промяна. <sup><a href="#src-5">[5]</a></sup></figcaption>
+        </figure>
+        <h3>Конфигуриране на mod_rewrite</h3>
+        <p>
+          Тъй като използвахме <code>SSLRequireSSL</code>, уеб страниците вече могат да бъдат достъпвани
+          само чрез <code>https://</code>. Това не е приятно за потребителя обаче, следователно е добре
+          да се добави директива в друг конфигурационен файл за XAMPP –
+          <code>C:\Xampp\Apache\conf\httpd.conf</code>, която да пренаписва URL-а и да
+          добавя <code>https://</code> дори когато потребителят се е опитал да достъпи ресурса
+          през <code>http</code> връзка.
+        </p>
+        <p>
+          Във въпросният файл, премахнете знакът <code>#</code> от линията:
+        </p>
+        <pre><code>
+          #LoadModule rewrite_module modules/mod_rewrite.so
+        </code></pre>
+        <p>
+          За да изглежда така:
+        </p>
+        <pre><code>
+          LoadModule rewrite_module modules/mod_rewrite.so
+        </code></pre>
+        <p>
+          След това, копирайте и поставете следните директиви в края файла
+          <code>C:\Xampp\Apache\conf\extra\httpd-xampp.conf</code> <sup><a href="#src-3">[3]</a></sup>:
+        </p>
+        <pre><code>
+          &lt;IfModule mod_rewrite.c&gt;
+              RewriteEngine On
+
+              # Redirect /xampp folder to https
+              RewriteCond %{HTTPS} !=on
+              RewriteCond %{REQUEST_URI} xampp
+              RewriteRule ^(.*) https://%{SERVER_NAME}$1 [R,L]
+
+              # Redirect /phpMyAdmin folder to https
+              RewriteCond %{HTTPS} !=on
+              RewriteCond %{REQUEST_URI} phpmyadmin
+              RewriteRule ^(.*) https://%{SERVER_NAME}$1 [R,L]
+
+              # Redirect /webalizer folder to https
+              RewriteCond %{HTTPS} !=on
+              RewriteCond %{REQUEST_URI} webalizer
+              RewriteRule ^(.*) https://%{SERVER_NAME}$1 [R,L]
+          &lt;/IfModule&gt;
+        </code></pre>
+        <h3>Конфигуриране на виртуално име (hostname)</h3>
+        <p>
+          Предпоследната стъпка е да добавим виртуално име (hostname), чрез което да достъпим
+          нашия проект. Това трябва да бъде същото име, на което издадохме сертификата в
+          стъпка 1, а именно в нашия случай <code>webabstract.ltd</code>. Конфигурационният файл, който
+          трябва да се достъпи в случая е следният:
+        </p>
+        <pre><code>
+          C:\Xampp\apache\conf\extra\httpd-vhosts.conf
+        </code></pre>
+        <p>
+          Като трябва да се добавят следните директиви в края на файла <sup><a href="#src-4">[4]</a></sup>:
+        </p>
+        <pre><code>
+          &lt;VirtualHost *:443&gt;
+              ServerAdmin kiril@webabstract.ltd
+              DocumentRoot "C:/xampp/htdocs/"
+              ServerName webabstract.ltd
+              ServerAlias webabstract.ltd
+              ErrorLog "logs/webabstract.ltd-error.log"
+              CustomLog "logs/webabstract.ltd-access.log" common
+              SSLEngine on
+              SSLCertificateFile "conf/ssl.crt/server.crt"
+              SSLCertificateKeyFile "conf/ssl.key/server.key"
+          &lt;/VirtualHost&gt;
+        </code></pre>
+        <h3>Добавяне на домейна и в hosts файла на системата</h3>
+        <p>
+          За достъп до виртуалното име от системата, трябва да добавите домейна и в
+          <code>hosts</code> файлът ѝ. За Windows, той се намира в <code>C:\Windows\System32\drivers\etc\hosts</code>.
+          Трябва да добавите на края следният ред:
+        </p>
+        <pre><code>
+          127.0.0.1 webabstract.ltd
+        </code></pre>
+        <h3>Тестване на сертификата</h3>
+        <p>
+          Следва спиране на Apache сървърът от контролния панел на XAMPP и повторното му пускане.
+          След което можете да опитате да влезете през новото виртуално хост име – <code>webabstract.ltd</code>.
+        </p>
+        <figure>
+          <img src="img/figure6.png" alt="Фиг 6. Екранна снимка - XAMPP Control Panel" />
+          <figcaption>Фиг 6. Екранна снимка - XAMPP Control Panel</figcaption>
+        </figure>
+        <p>
+          Както се вижда от Google Chrome (фиг. 7), браузърът предупреждава, че връзката не е сигурна.
+          Това е поради факта, че сертификатът е издаден от името на самия сайт (self-signed),
+          а не от доверен източник, например Let’s Encrypt. Както споменахме по-горе, издаване на
+          сертификат от Let’s Encrypt е възможно само ако притежавате домейна, на чието име желаете да
+          го издадете (основния принцип на SSL сертификатът).
+        </p>
+        <figure>
+          <img src="img/figure7.png" />
+          <figcaption>Фиг 7. Екранна снимка - Google Chrome показва, че сертификатът не е доверен.</figcaption>
+        </figure>
+      </section>
+      <section id="sect-8" class="sources">
+        <h2>Използвани източници:</h2>
+        <ul>
+          <li id="src-1">
+            <i>[1]</i> <a class="extlink" href="https://gist.github.com/nguyenanhtu/33aa7ffb6c36fdc110ea8624eeb51e69" target="_blank">
+            "Guide to configure SSL in XAMPP for Windows"</a> Github, автор: nguyenanhtu, публикуван 2016-11-23, последно посетен на: 2021-04-13.
+          </li>
+          <li id="src-2">
+            <i>[2]</i> <a class="extlink" href="https://letsencrypt.org/how-it-works/" target="_blank">
+            "How it works - Let's Encrypt"</a> Let's Encrypt Foundation, последно обновен на: 2018-10-18, последно посетен на: 2021-04-13.
+          </li>
+          <li id="src-3">
+            <i>[3]</i> <a class="extlink" href="https://medium.com/@ajtech.mubasheer/setup-https-in-xampp-for-localhost-bc3d01393f31" target="_blank">
+            "Setup ‘https’ in XAMPP for localhost"</a> Medium.com, автор: Mubasheer Shaik, публикуван 2019-05-24, последно посетен на: 2021-04-13.
+          </li>
+          <li id="src-4">
+            <i>[4]</i> <a class="extlink" href="https://www.ssldragon.com/blog/how-to-install-an-ssl-certificate-for-localhost-xampp/" target="_blank">
+            "How to Install an SSL certificate for Localhost XAMPP?"</a> SSL Dragon, публикуван 2019-04-25, последно посетен на: 2021-04-13.
+          </li>
+          <li id="src-5">
+            <i>[5]</i> <a class="extlink" href="http://robsnotebook.com/xampp-ssl-encrypt-passwords/" target="_blank">
+            "XAMPP: SSL Encrypt the Transmission of Passwords with https"</a> Rob's Notebook, публикуван 2007-07-15, последно посетен на: 2021-04-13.
+          </li>
+          <li id="src-6">
+            <i>[6]</i> <a class="extlink" href="https://www.digicert.com/what-is-an-ssl-certificate" target="_blank">
+            "What is an SSL Certificate?"</a> Digicert, последно посетен на: 2021-04-13.
+          </li>
+          <li id="src-7">
+            <i>[7]</i> <a class="extlink" href="https://news.netcraft.com/archives/2015/05/13/counting-ssl-certificates.html" target="_blank">
+            "Counting SSL certificates"</a> Netcraft, публикуван 2015-05-13, последно посетен на: 2021-04-13.
+          </li>
+          <li id="src-8">
+            <i>[8]</i> <a class="extlink" href="https://www.globalsign.com/en/ssl-information-center/types-of-ssl-certificate" target="_blank">
+            "What Are The Different Types of SSL Certificates?"</a> GlobalSign, последно посетен на: 2021-04-13.
+          </li>
+          <li id="src-9">
+            <i>[9]</i> <a class="extlink" href="https://cabforum.org/wp-content/uploads/CA-Browser-Forum-EV-Guidelines-v1.7.5.pdf" target="_blank">
+            "Guidelines for the Issuance and Management of Extended Validation Certificates"</a> CA/Browser Forum, версия 1.7.5, публикуван 2021-04-05, последно посетен на: 2021-04-13.
+          </li>
+          <li id="src-10">
+            <i>[10]</i> <a class="extlink" href="https://www.zdnet.com/article/securing-the-web-once-and-for-all-the-open-encryption-project/" target="_blank">
+            "Securing the web once and for all: The Let's Encrypt Project"</a> ZDNet, автор: Steven J. Vaughan-Nichols, публикуван 2015-04-09, последно посетен на: 2021-04-13.
+          </li>
+          <li id="src-11">
+            <i>[11]</i> <a class="extlink" href="https://www.leaderssl.com/" target="_blank">
+            "LeaderSSL"</a> LeaderSSL, последно посетен на: 2021-04-13.
+          </li>
+          <li id="src-12">
+            <i>[12]</i> <a class="extlink" href="https://wplift.com/what-is-an-ssl-certificate" target="_blank">
+            "What is an SSL Certificate and Why is it Important for Your Site?"</a> WPLift, публикуван 2016-12-07, последно обновен на: 2021-03-29, последно посетен на: 2021-04-13.
+          </li>
+        </ul>
+      </section>
+    </main>
+  </body>
+</html>
